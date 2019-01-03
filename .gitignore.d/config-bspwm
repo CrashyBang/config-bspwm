@@ -1,0 +1,10 @@
+*
+!/.gitignore.d
+!/.gitignore.d/config-bspwm
+!/.config/bspwm
+!/.config/bspwm/*
+!/.config/polybar
+!/.config/polybar/*
+!/.config/sxhkd
+!/.config/sxhkd/*
+!/.xprofile
