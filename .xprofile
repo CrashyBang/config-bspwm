@@ -1,0 +1,67 @@
+#!/bin/sh
+
+#.xprofile
+# https://stackoverflow.com/questions/41397361/xprofile-vs-xsession-vs-xinitrc
+
+# Logs
+mkdir -p /tmp/autostart-logs
+mkdir -p /tmp/flatpak-logs
+
+#Flatpak
+# https://github.com/flatpak/flatpak/issues/2464
+
+#https://github.com/flatpak/flatpak/issues/2169#issuecomment-448652037
+# export XDG_RUNTIME_DIR=/run/user/$(id -u)
+
+# DBUS (Discord)
+# https://stackoverflow.com/questions/41242460/how-to-export-dbus-session-bus-address
+export $(dbus-launch)
+
+# Pulseaudio
+# https://github.com/moonlight-stream/moonlight-qt/issues/146
+# https://github.com/flatpak/flatpak/issues/2169#issuecomment-448652037
+# export PULSE_SERVER=unix:/tmp/pulse-PKdhtXMmr18n/native
+
+# Fix font-scaling
+# https://github.com/jwilm/alacritty/issues/1378
+# https://github.com/jwilm/alacritty/pull/1403 (Need to research this further)
+export WINIT_HIDPI_FACTOR=1.0
+
+# Set up multiple monitors
+# https://protesilaos.com/codelog/multihead-bspwm-polybar/
+WALLPAPER_DIR=~/Dropbox/Images/Wallpapers
+BACKGROUND=$(find $WALLPAPER_DIR -type f | shuf -n 1)
+EXTERNAL_MONITOR=$(xrandr --query | grep 'DP1')
+if [[ $EXTERNAL_MONITOR = *connected* ]]; then
+    xrandr \
+        --output eDP1 \
+        --primary \
+        --mode 1920x1080 \
+        --rotate normal \
+        --output DP1 \
+        --mode 1920x1080 \
+        --rotate normal \
+        --right-of eDP1
+
+    # Had to go out of my way to set the same image on two screens, && prevents race condition
+    (nitrogen --head=0 --set-zoom-fill $BACKGROUND && nitrogen --head=1 --set-zoom-fill $BACKGROUND) &
+
+    # Run two polybars here (Requires sleep)
+    (sleep 1s && polybar multi-screen-one > /tmp/autostart-logs/polybar-multi-screen-one.log 2>&1) &
+    (sleep 1s && polybar multi-screen-two > /tmp/autostart-logs/polybar-multi-screen-two.log 2>&1) &
+else
+    nitrogen --head=0 --set-zoom-fill $BACKGROUND &
+    (sleep 1s && polybar single-screen > /tmp/autostart-logs/polybar-single-screen.log 2>&1) &
+fi
+
+# File manager
+# https://wiki.voidlinux.eu/Automount
+thunar --daemon &
+
+# Mountable drives
+# https://wiki.archlinux.org/index.php/thunar#Automounting_of_large_external_drives
+udiskie --use-udisks2 > /tmp/autostart-logs/udiskie.log 2>&1 &
+
+# Dropbox
+(sleep 1s && flatpak run com.dropbox.Client > /tmp/flatpak-logs/com.dropbox.Client 2>&1) & 
+
