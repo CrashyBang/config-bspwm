@@ -29,7 +29,7 @@ super + e
 	rofi -show ssh
 
 # make sxhkd reload its configuration files:
-super + Escape
+super + grave
 	pkill -USR1 -x sxhkd
 
 #
@@ -37,7 +37,7 @@ super + Escape
 #
 
 # quit bspwm normally
-super + grave
+super + Escape
 	bspc quit
 
 # close and kill
@@ -54,7 +54,7 @@ super + slash
 
 # swap the current node and the biggest node
 super + c
-	bspc node -s biggest
+	bspc node -s biggest.local
 
 #
 # state/flags

@@ -3,6 +3,11 @@
 #.xprofile
 # https://stackoverflow.com/questions/41397361/xprofile-vs-xsession-vs-xinitrc
 
+# Fix docker
+# https://wiki.voidlinux.org/Docker#Troubleshooting
+#mkdir /sys/fs/cgroup/systemd
+#mount -t cgroup -o none,name=systemd cgroup /sys/fs/cgroup/systemd
+
 # Logs
 mkdir -p /tmp/autostart-logs
 mkdir -p /tmp/flatpak-logs
